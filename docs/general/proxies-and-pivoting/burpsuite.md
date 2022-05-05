@@ -47,6 +47,15 @@ We extract a text using regular expressions. This can be useful when processing 
 
 * Grep - Extract → Add → Select the CSRF token to create the regular expression → Ok → Select Payload of type "Recursive grep" with the grep we created.
 {% endtab %}
+
+{% tab title="Extensions" %}
+### Extensions
+
+* **Error Message Checks**: This extension passively reports detailed server error messages, as they are not usually visible during the normal course of testing.
+* **JS Link Finder**: Burp extension for passive scanning of JavaScript files for endpoint links (excludes specific 'js' files, e.g. jquery, google-analytics).
+* **Hunt Scanner**: Identifies common parameters vulnerable to certain vulnerability classes.
+*
+{% endtab %}
 {% endtabs %}
 
 ## Tricks

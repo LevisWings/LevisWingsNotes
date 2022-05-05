@@ -14,9 +14,17 @@ Also **check your privileges over the processes binaries**, maybe you can overwr
 
 ### Process monitoring
 
+{% hint style="success" %}
+It is recommended to leave pspy running in a separate terminal to see if there is any other strange behavior when, for example, running a suspicious binary.
+{% endhint %}
+
 {% tabs %}
 {% tab title="pspy" %}
 You can use tools like [**pspy**](https://github.com/DominicBreuker/pspy) to monitor processes. This can be very useful to identify vulnerable processes being executed frequently or when a set of requirements are met.
+
+{% hint style="danger" %}
+Remember to check the system architecture to download the correct version of pspy.
+{% endhint %}
 
 ### Download binary
 
@@ -69,4 +77,3 @@ done
 ```
 {% endtab %}
 {% endtabs %}
-

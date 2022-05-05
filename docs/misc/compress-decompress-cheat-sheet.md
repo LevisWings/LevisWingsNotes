@@ -1,10 +1,12 @@
-# Compress/Decompress Cheat Sheet
+# Compress/Decompress/Fix Cheat Sheet
+
+## Compress/Decompress
 
 {% tabs %}
 {% tab title="7z" %}
 ```bash
 7z l <FILE> # List the contents of the compressed file.
-7z 
+7z
 ```
 {% endtab %}
 
@@ -30,3 +32,16 @@ tar xf <FILE>.tar # Decompress (.tar)
 ```
 {% endtab %}
 {% endtabs %}
+
+## Fix gz
+
+Fix corrupted gz-files:
+
+```bash
+git clone https://github.com/yonjar/fixgz
+cd fixgz
+g++ fixgz.cpp -o fixgz
+./fixgz <bad gz> fixed.gz
+
+gunzip fixed.gz
+```

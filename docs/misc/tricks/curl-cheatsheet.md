@@ -33,3 +33,7 @@ curl -s -X POST "<URL>" -F 'add=1' -F 'image=@shell.php' -x http://127.0.0.1:808
 ```
 
 ![](../../.gitbook/assets/post\_form\_data.png)
+
+### cURL command to code
+
+{% embed url="https://curlconverter.com" %}

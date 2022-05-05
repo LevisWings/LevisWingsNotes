@@ -26,7 +26,7 @@ These are some of the questions we should be asking ourselves:
 
 If you see anything in the image that can be extracted into a keyword, phrase, a company name, telephone number or any other question you may have as a result of scanning the image up and down: GOOGLE IT!
 
-Do you see anything in the image that can be used in a search query or help you narrow down the possible location? Use "[Google Dorking](../../../pentesting-services/80-443-http-s/web-reconnaissance/google-dorking.md)" to get an answer.
+Do you see anything in the image that can be used in a search query or help you narrow down the possible location? Use "[Google Dorking](../../../pentesting-web/web-reconnaissance/google-dorking.md)" to get an answer.
 
 When geolocating a picture finding the exact location is key, but we may need to answer other questions about the location or the image as well, usually referred to as context questions.
 
@@ -35,6 +35,10 @@ If we find an image of a restaurant (from the front) that has multiple branches 
 ### #3. Reverse image search (RIS)
 
 Today's search engines not only allow keyword-based queries, but all search engines (such as Google) also have a reverse image search (RIS) function.
+
+We can use Google Lens or Yandex.
+
+{% embed url="https://yandex.eu/images" %}
 
 The method for doing this with Google (Lens) is as follows:
 
@@ -45,4 +49,3 @@ The method for doing this with Google (Lens) is as follows:
 * Now, as we have the image in the browser (regardless if it is local or online), right click and select the option "Search image with Lens".
 
 ![Lens also allows us to crop an image to our liking, to search for the part we are most interested in.](../../../.gitbook/assets/lens\_example.jpg)
-

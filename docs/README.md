@@ -1,7 +1,3 @@
----
-description: Tets
----
-
 # Welcome
 
 Welcome to the book that will try, in an organized way, to cover most of the information about the field of Penetration Testing, Ethical Hacking and Bug Bounty.

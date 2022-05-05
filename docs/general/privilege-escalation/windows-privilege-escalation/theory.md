@@ -1,4 +1,205 @@
-# 📚 Theory
+# 📚 Theory (Windows)
+
+## Windows Versions
+
+Major Windows operating systems and associated version numbers:
+
+| Names                                | Version Number |
+| ------------------------------------ | -------------- |
+| Windows NT 4                         | 4.0            |
+| Windows 2000                         | 5.0            |
+| Windows XP                           | 5.1            |
+| Windows Server 2003, 2003 R2         | 5.2            |
+| Windows Vista, Server 2008           | 6.0            |
+| Windows 7, Server 2008 R2            | 6.1            |
+| Windows 8, Server 2012               | 6.2            |
+| Windows 8.1, Server 2012 R2          | 6.3            |
+| Windows 10, Server 2016, Server 2019 | 10.0           |
+
+{% hint style="info" %}
+If you want to know how to enumerate Windows versions through a console, you can go to [this link](initial-enumeration-windows.md#windows-version).
+{% endhint %}
+
+## Windows Structure
+
+The root directory in Windows is `<drive_letter>:\`, where it is usually the `C:\` drive, which is where the operating system is installed. Other physical and virtual drives are assigned other letters, for example, **USB** (`F:\`).
+
+### Directory structure of the boot partition (Windows)
+
+* **AppData**: All data and configuration information of installed applications per user is stored here. Within this folder, there are 3 subfolders. The **Roaming** folder is where the data of applications that "roam" between computers with the same account is stored. The **Local** folder is where information associated with a single computer is stored and is never synchronized over the network. The **LocalLow** folder is designed to house "low intensity" or lower data integrity level applications, which are those that run with specific, more restricted security settings. For example, if an application needs to run in protected mode, its data will always be in LocalLow and not Local.
+* **Perflogs**: Stores system problems and other performance reports, but is empty by default.
+* **Program Files**: Third-party applications installed on the computer are found. On 32-bit systems, all 16-bit and 32-bit programs are installed here, while on 64-bit systems, only 64-bit programs are installed here.
+* **Program Files (x86)**: Third-party applications installed on the computer are found. This folder is only available in 64-bit editions of Windows, where 32-bit and 16-bit programs are installed.
+* **ProgramData**: Hidden folder containing all data, settings and user files required for certain installed software. This directory contains application data for all users.
+* **System, System32, SysWOW64**: Folder containing all the DLLs required for the main functions of Windows and its API. By default, Windows searches these folders whenever a program requests to load a DLL without specifying an absolute path.
+* **Users**: It contains the profiles of the users that connect to the system and contains the following two folders: Public and Default.
+* **Windows**: Folder containing most of the files needed for the Windows operating system.
+* **WinSxS**: It stores the files needed to recover your system. System updates can be downloaded to your system and then stored in the WinSxS folder.
+
+## File System
+
+NTFS (New Technology File System) is the default Windows file system since Windows NT 3.1. NTFS is reliable and can restore file system consistency in case of system failure or power loss, and provides security by allowing us to set granular permissions on both files and folders. It also has built-in journaling, which means that file modifications are logged. However, many older and mobile devices do not support NTFS natively.
+
+### Permissions
+
+NTFS main permissions:
+
+* **Full Control**: Permission to read, write, modify and delete files/folders.
+* **Modify**: Permission to read, write and delete files/folders.
+* **Write**: Permission to add files to folders and subfolders and write to a file.
+* **Read**: Permission to view and list folders and subfolders and to view the contents of a file.
+* **List Folder Contents**: Permission to view and list folders and subfolders, as well as execute files (folders only inherit this permission).
+* **Read and Execute**: Permission to view and list files and subfolders, as well as execute files (files and folders inherit this permission).
+* **Traverse Folder**: Permission that allows or denies the ability to move through folders to reach other files or folders.
+
+### icacls
+
+While the GUI exists to manage NTFS permissions in Windows, we can use the `icacls` (Integrity Control Access Control List) command.
+
+`icacls` displays or modifies the discretionary access control lists (DACLs) in the specified files, and applies the stored DACLs to the files in the specified directories.
+
+```bash
+icacls <PATH>/<FILE/DIRECTORY>
+```
+
+```bash
+C:\Users\leviswings>icacls c:\windows
+c:\windows NT SERVICE\TrustedInstaller:(F)
+           NT SERVICE\TrustedInstaller:(CI)(IO)(F)
+           NT AUTHORITY\SYSTEM:(M)
+           NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+           BUILTIN\Administrators:(M)
+           BUILTIN\Administrators:(OI)(CI)(IO)(F)
+           BUILTIN\Users:(RX)
+           BUILTIN\Users:(OI)(CI)(IO)(GR,GE)
+           CREATOR OWNER:(OI)(CI)(IO)(F)
+           APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(RX)
+           APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE)
+           APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED APPLICATION PACKAGES:(RX)
+           APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE)
+```
+
+### Inheritance rights
+
+Inheritance rights can precede either form and are applied only to directories:
+
+* `(CI)`: container inherit = destination folder, child folder, grandchild folder.
+* `(OI)`: object inherit = destination folder, child object (file), grandchild object (file).
+* `(IO)`: inherit only
+* `(NP)`: do not propagate inherit
+* `(I)`: permission inherited from parent container
+
+Combinations:
+
+* `(OI)` + `(IO)` = "**Files only**". Child object (folder file), grandchild object (subfolders file). ACE is not applied to this container, but is propagated to the files it contains. Subfolders do not receive this ACE.
+* `(CI)` + `(IO)` = "**Subfolders only**". Child folder, grandchild folder. ACE does not apply to this container, but propagates to subfolders. Does not propagate to contained files.
+* `(CI)` + `(OI)` = "**This folder, subfolders and files**". Target folder, child folder, child object (file), grandchild folder, grandchild object (file). All subordinate objects inherit this ACE, unless they are configured to block ACL inheritance altogether.
+* `(CI)` + `(OI)` + `(IO)` = "**Subfolders and files only**". Child folder, child object (file), grandchild folder, grandchild object (file). ACE does not apply to this container, but propagates to both the subfolders and the files it contains.
+
+{% hint style="info" %}
+More information here: [https://ss64.com/nt/icacls.html](https://ss64.com/nt/icacls.html)
+{% endhint %}
+
+### Simple rights / Specific rights
+
+Permission is a permission mask and can be specified in one of two forms:
+
+#### Sequence of simple rights
+
+* `F` : Full access
+* `D` :  Delete access
+* `N` :  No access
+* `M` :  Modify access
+* `RX` :  Read and execute access
+* `R` :  Read-only access
+* `W` :  Write-only access
+
+#### Comma-separated list in parentheses of specific rights
+
+* `DE` - Delete
+* `RC` - read control
+* `WDAC` - write DAC
+* `WO` - write owner
+* `S` - synchronize
+* `AS` - access system security
+* `MA` - maximum allowed
+* `GR` - generic read
+* `GW` - generic write
+* `GE` - generic execute
+* `GA` - generic all
+* `RD` - read data/list directory
+* `WD` - write data/add file
+* `AD` - append data/add subdirectory
+* `REA` - read extended attributes
+* `WEA` - write extended attributes
+* `X` - execute/traverse
+* `DC` - delete child
+* `RA` - read attributes
+* `WA` - write attributes
+
+### Modify permissions
+
+```bash
+icacls "<PATH TO FILE/DIRECTORY>" /grant <USERNAME/GROUP>:<PERM> # The <PERM> must be one of the permissions.
+icacls "<PATH TO FILE/DIRECTORY>" /grant:r <USERNAME/GROUP>:<PERM>
+icacls "<PATH TO FILE/DIRECTORY>" /remove <USERNAME/GROUP> # Remove all occurrences of User from the acl.
+```
+
+### Share Permissions
+
+The Server Message Block (SMB) protocol is used in Windows to connect shared resources such as files and printers. It is used in environments of different sizes. SMB uses shared permissions, which are as follows:
+
+* **Full Control**: Users can perform Change and Read permissions, and change permissions of NTFS files and subfolders.
+* **Change**: Users can read, edit, delete and add files and subfolders.
+* **Read**: Users can view the contents of files and subfolders.
+
+It should be clarified that NTFS permissions and sharing permissions are not the same but both can be applied to the same resource.
+
+### NTFS vs Share permissions
+
+* NTFS permissions apply to the system where the folder and files are hosted. Folders created in NTFS inherit the permissions of the parent folders by default, although this inheritance can be disabled. These permissions are considered whether you are connected locally or via RDP, even if it is a shared folder with shared permissions. Shared permissions are applied when the folder is accessed via the SMB protocol, usually from a different system over the network.
+* Shared permissions provide less granular control than NTFS permissions.
+
+## Windows Services & Processes
+
+### Windows Services
+
+Services allow the creation and management of long-running processes, and in Windows they can be started automatically at system startup and also continue to run in the background even after the user logs out of his or her account on the system.
+
+In Windows, services play a very important role, since they perform network functions, updates, user credentials management, etc.
+
+They can be managed in two ways:
+
+* **GUI**: services.msc -> Service Control Manager (SCM)
+* **Command line**: sc.exe or Get-Service (PowerShell)
+
+Characteristics of services in Windows:
+
+* Services can be in three states: running, stopped and paused.
+* When running or stopping a service, the status of the service will change to "Starting" or "Stopping" until the specified action is completed.
+* There are three types of services: Local Services, Network Services and System Services.
+* They can be configured to start manually or automatically.
+
+## Services Permissions
+
+We can examine the permissions of the services using the following command:
+
+```bash
+# CMD:
+sc sdshow wuauserv
+
+D:(A;;CCLCSWRPLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+# PowerShell:
+Get-ACL -Path HKLM:\System\CurrentControlSet\Services\wuauserv | Format-List
+```
+
+Every named object in Windows is a securable object, and even some unnamed objects are securable, so if it is securable (in Windows), it will have a security descriptor.
+
+Security descriptors identify the owner of the object and a primary group containing a discretionary access control list (DACL) and a system access control list (SACL).
+
+Generally, a DACL is used to control access to an object, and a SACL is used to account for and log access attempts.
+
+The order to read a DACL is first the characters after the 3 semicolons, then the character after the 2 semicolons, and finally the characters in the middle of the semicolons.
 
 ## Windows Security
 

@@ -37,6 +37,7 @@ dir -Path C:\ -Include <EXPRESSION> -File -Recurse # Get-ChildItem -Path C:\ -In
 dir C:\ -Recurse -Include *.rdp, *.config, *.vnc, *.cred -ErrorAction Ignore
 # Search for file contents:
 Select-String -Path C:\Users\* -Pattern password
+dir -recurse | Select-String "<USERNAME>"
 ```
 {% endtab %}
 

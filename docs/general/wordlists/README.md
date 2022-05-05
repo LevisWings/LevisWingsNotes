@@ -24,6 +24,8 @@ wget https://raw.githubusercontent.com/Sq00ky/attacktive-directory-tools/master/
 /opt/SecLists/Discovery/Web-Content/raft-medium-words.txt # 5
 /opt/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt # 6
 /opt/SecLists/Discovery/Web-Content/raft-medium-words-lowercase.txt # 7
+
+# Combine all 6 wordlists in 1.
 ```
 
 ### For extensions

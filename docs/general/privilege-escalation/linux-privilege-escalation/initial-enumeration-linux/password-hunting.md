@@ -10,6 +10,7 @@ Remember, **it is not necessary** that a **password** must be next to a **keywor
 ```bash
 grep --color=auto -rnw '<PATH>' -ie "PASSWORD" --color=always 2>/dev/null
 grep -r -i -E "pass|user|key|secret" 2>/dev/null
+grep -r -i -E "pass|user|key|secret" --text # Recursive search (even in binaries)
 grep -iRl "password" #  If it finds a match, it will only print the file path.
 locate password | more # locate pass | more
 find / -name authorized_keys 2>/dev/null

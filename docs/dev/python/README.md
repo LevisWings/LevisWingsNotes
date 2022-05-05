@@ -1,5 +1,7 @@
 # Python
 
+### Date
+
 ```python
 #!/usr/bin/python3                                                                                 │
                                                                                                    │       %S     second (00..60)
@@ -19,3 +21,14 @@ for year in range(2001,2023):
         for day in range(1,31):
             print(f'{year}'+f'{month}'+f'{day:02}')
 ```
+
+### Code execution
+
+```python
+# import os:
+os.system("whoami")
+# import subprocess:
+subprocess.check_output("""whoami""", shell=True).decode().strip()
+subprocess.check_output("""%s;%s""" % ("whoami", "id"), shell=True).decode().strip()
+```
+

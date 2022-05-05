@@ -82,6 +82,7 @@ dir /b /ad "C:\Users\"
 dir /b /ad "C:\Documents and Settings\" # Windows XP and below
 Get-LocalUser | ft Name,Enabled,LastLogon,Description
 Get-ChildItem C:\Users -Force | select Name
+Get-Command # Do we have a special function in PowerShell?
 qwinsta # Is anyone else logged in?
 query user # Same as qwinsta
 net user <USERNAME> # To see more information about that user.
@@ -106,20 +107,33 @@ By running `net user` or `net users`, and `whoami`, we can confirm if we are a l
 
 ## System Enumeration
 
+### Windows version
+
+```bash
+systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
+Get-WmiObject -Class Win32_OperatingSystem
+Get-WmiObject -Class Win32_OperatingSystem | select Version,BuildNumber
+```
+
+{% hint style="info" %}
+If you want to see which are the main versions of Windows, you can consult [this link](theory.md#windows-versions).
+{% endhint %}
+
 ### General, system architecture
 
 ```shell
 # General:
-dir <PATH> /a # View hidden files and directories of the PATH we specify.
 systeminfo # System information.
-systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
-Get-WmiObject -Class Win32_OperatingSystem
-Get-WmiObject -Class Win32_OperatingSystem | select Version,BuildNumber
 hostname
 echo %windir%
 # System architecture:
 echo %PROCESSOR_ARCHITECTURE%
 wmic os get osarchitecture
+# View hidden files and directories of the PATH we specify:
+dir <PATH> /a 
+ls -force <PATH>
+ls -force <PATH> -recurse # Hidden files (recursive)
+gci -force <PATH>
 ```
 
 ### PATH
@@ -144,6 +158,7 @@ wmic logicaldisk # Enumerate logical disks.
 wmic logicaldisk get caption,description,providername # Filter disks by caption (C/D/E/F,ETC), description and vendor. Much nicer.
 Get-PSDrive | where {$_.Provider -like "Microsoft.PowerShell.Core\FileSystem"}| ft Name,Root
 powershell -c "Get-PSDrive | where {$_.Provider -like \"Microsoft.PowerShell.Core\FileSystem\"}| ft Name,Root" # CMD
+powershell -c get-psdrive -psprovider filesystem
 ```
 
 ### Unmounted disks

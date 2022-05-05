@@ -18,7 +18,8 @@ apt list 2>/dev/null # grep "^sudo" : Ver la versión de sudo y buscar posibles 
 lsof # Enumera los archivos abiertos. lsof -u <USER> para ver los archivos abiertos de un determinado usuario. lsof -i para ver las conexiones disponibles. lsof -i :<PORT NUMER> para ver si está ocupado ese puerto.
 lspci # Enumera los dispositivos PCI.
 lsattr <FILE>
-systemctl -list-timers
+systemctl list-timers
+systemctl list-units --type=service
 dpkg -l # Para los sistemas Debian.
 which <COMMAND>
 command -v <COMMAND>

